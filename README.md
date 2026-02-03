@@ -5,7 +5,6 @@ A Retrieval-Augmented Generation (RAG) application that enables natural language
 > **Note:** This is a friendly tinkering project while I explore and learn about RAGs.
 
 ![Python](https://img.shields.io/badge/python-3.12+-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Streamlit](https://img.shields.io/badge/streamlit-1.53+-red.svg)
 
 ## ✨ Features
