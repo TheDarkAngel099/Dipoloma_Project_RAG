@@ -37,7 +37,7 @@ A Retrieval-Augmented Generation (RAG) application that enables natural language
 
 1. **Clone the repository:**
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/TheDarkAngel099/Dipoloma_Project_RAG
 cd RAG
 ```
 
