@@ -2,6 +2,8 @@
 
 A Retrieval-Augmented Generation (RAG) application that enables natural language question-answering over diploma project documents. Built with FAISS for vector search, Sentence Transformers for embeddings, and Groq's LLaMA for AI-powered responses.
 
+> **Note:** This is a friendly tinkering project while I explore and learn about RAGs.
+
 ![Python](https://img.shields.io/badge/python-3.12+-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Streamlit](https://img.shields.io/badge/streamlit-1.53+-red.svg)
@@ -47,7 +49,7 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 3. **Install dependencies:**
 ```bash
-pip install -r requirements.txt
+pip install -r requirement.txt
 ```
 
 4. **Configure environment variables:**
@@ -63,12 +65,16 @@ Place your PDF, DOCX, or other supported documents in the `data/pdfs/` directory
 
 ### Running the Web Application
 
-Start the Streamlit app:
+Start the Streamlit app (from the venv):
 ```bash
-streamlit run app.py
+python -m streamlit run app.py
 ```
 
-The app will be available at `http://localhost:8502`
+The app will be available at a local URL printed in the terminal (usually `http://localhost:8501` or `http://localhost:8502`).
+
+**Important:** The app now lazy-loads the RAG system for faster startup. Use the sidebar buttons:
+- **Load RAG (fast):** Loads existing FAISS index (no rebuild)
+- **Build/Refresh Index (slow):** Builds index from documents if missing
 
 ### Using the Python API
 
@@ -151,7 +157,7 @@ Modify in `src/search.py`:
 ## 🔧 Troubleshooting
 
 ### Vector Store Not Found
-If you see "FAISS index not found", the system will automatically build it from documents in `data/pdfs/` on first run.
+If you see "FAISS index not found", use **Build/Refresh Index (slow)** in the sidebar to build it from documents in `data/pdfs/`.
 
 ### Out of Memory
 Reduce `chunk_size` or process documents in smaller batches if you encounter memory issues.

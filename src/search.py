@@ -21,7 +21,7 @@ class RAGSearch:
     generating contextual summaries based on retrieved documents.
     """
     
-    def __init__(self, persist_dir: str = "faiss_store", embedding_model: str = "all-MiniLM-L6-v2", llm_model: str = "llama-3.1-8b-instant"):
+    def __init__(self, persist_dir: str = "faiss_store", embedding_model: str = "all-MiniLM-L6-v2", llm_model: str = "llama-3.1-8b-instant", build_if_missing: bool = True):
         """
         Initialize the RAG search system with vector store and LLM.
         
@@ -44,7 +44,11 @@ class RAGSearch:
         
         # Check if vector store already exists; if not, build it from documents
         if not (os.path.exists(faiss_path) and os.path.exists(meta_path)):
-            from data_loader import load_all_documents
+            if not build_if_missing:
+                raise FileNotFoundError(
+                    f"FAISS index not found at {faiss_path}. Build the index first or enable build_if_missing."
+                )
+            from .data_loader import load_all_documents
             # Load all documents from the data directory
             docs = load_all_documents(data_dir)
             # Build and persist the vector index

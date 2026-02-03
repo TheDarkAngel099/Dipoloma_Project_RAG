@@ -40,7 +40,7 @@ st.markdown("""
 # ==================== RAG SYSTEM INITIALIZATION ====================
 # Cache the RAG system to avoid reloading on every interaction
 @st.cache_resource
-def load_rag_system():
+def load_rag_system(build_if_missing: bool):
     """
     Load and cache the RAG system.
     
@@ -54,7 +54,8 @@ def load_rag_system():
         rag = RAGSearch(
             persist_dir="faiss_store",           # FAISS index directory
             embedding_model="all-MiniLM-L6-v2",  # Sentence transformer model
-            llm_model="llama-3.1-8b-instant"     # Groq LLM model
+            llm_model="llama-3.1-8b-instant",    # Groq LLM model
+            build_if_missing=build_if_missing
         )
     return rag
 
@@ -67,6 +68,8 @@ st.markdown("---")
 # Initialize chat history in session state (persists across reruns)
 if "messages" not in st.session_state:
     st.session_state.messages = []
+if "rag_system" not in st.session_state:
+    st.session_state.rag_system = None
 
 # ==================== SIDEBAR CONFIGURATION ====================
 with st.sidebar:
@@ -105,14 +108,28 @@ with st.sidebar:
         st.session_state.messages = []
         st.rerun()
 
+    st.markdown("---")
+
+    # Controls to load or build the RAG system (lazy load to reduce startup time)
+    st.header("⚡ Performance")
+    if st.button("🚀 Load RAG (fast)"):
+        try:
+            st.session_state.rag_system = load_rag_system(build_if_missing=False)
+            st.success("✅ RAG loaded from existing index.")
+        except Exception as e:
+            st.error(f"❌ Load failed: {e}")
+    if st.button("🛠️ Build/Refresh Index (slow)"):
+        try:
+            st.session_state.rag_system = load_rag_system(build_if_missing=True)
+            st.success("✅ Index built and RAG loaded.")
+        except Exception as e:
+            st.error(f"❌ Build failed: {e}")
+
 # ==================== LOAD RAG SYSTEM ====================
-# Load the RAG system with error handling
-try:
-    rag_system = load_rag_system()
-    st.success("✅ RAG system loaded successfully!")
-except Exception as e:
-    st.error(f"❌ Error loading RAG system: {e}")
-    st.stop()  # Stop execution if system fails to load
+# Lazy-load the RAG system to keep startup fast
+rag_system = st.session_state.rag_system
+if rag_system is None:
+    st.info("⚡ RAG system not loaded yet. Use the sidebar to load or build the index.")
 
 # ==================== DISPLAY CHAT HISTORY ====================
 # Render all previous messages in the chat
@@ -127,6 +144,9 @@ for message in st.session_state.messages:
 # ==================== CHAT INPUT AND RESPONSE GENERATION ====================
 # Handle new user input
 if prompt := st.chat_input("Ask a question about your diploma project..."):
+    if rag_system is None:
+        st.warning("Please load or build the RAG system first (see sidebar).")
+        st.stop()
     # Add user message to chat history
     st.session_state.messages.append({"role": "user", "content": prompt})
     
